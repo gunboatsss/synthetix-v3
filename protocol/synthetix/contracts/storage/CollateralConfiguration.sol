@@ -7,6 +7,7 @@ import "@synthetixio/core-contracts/contracts/errors/ParameterError.sol";
 import "@synthetixio/oracle-manager/contracts/interfaces/INodeModule.sol";
 import "@synthetixio/oracle-manager/contracts/storage/NodeOutput.sol";
 import "@synthetixio/core-contracts/contracts/interfaces/IERC20.sol";
+import "@synthetixio/core-contracts/contracts/interfaces/IVotes.sol";
 import "@synthetixio/core-contracts/contracts/utils/SafeCast.sol";
 
 import "./OracleManager.sol";
@@ -95,6 +96,7 @@ library CollateralConfiguration {
          * Note: If zero, liquidationRewardD18 will be used.
          */
         uint256 minDelegationD18;
+        address delegatee;
     }
 
     /**
@@ -169,6 +171,11 @@ library CollateralConfiguration {
         storedConfig.liquidationRewardD18 = config.liquidationRewardD18;
         storedConfig.minDelegationD18 = config.minDelegationD18;
         storedConfig.depositingEnabled = config.depositingEnabled;
+
+        if (storedConfig.delegatee != config.delegatee) {
+            IVotes(config.delegatee).delegate(config.delegatee);
+        }
+        storedConfig.delegatee = config.delegatee;
     }
 
     /**
